@@ -15,7 +15,7 @@ vpath %.h src/
 
 .PHONY: all build clean tests AX12console jsinstall
 
-all: build build/$(TARGET) tests
+all: build build/$(TARGET)
 
 build:
 	@mkdir -p build
