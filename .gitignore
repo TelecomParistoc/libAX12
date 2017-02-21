@@ -1,0 +1,16 @@
+**/.DS_Store
+build/
+src/config.h
+**/.travis.yml
+tests/AX12position
+tests/AXcomm
+tests/AXmove
+tests/IMU
+tests/powertest
+tests/timing
+tests/toolbox
+._*
+*.swp
+doc/html
+doc/latex
+.pirun.*
