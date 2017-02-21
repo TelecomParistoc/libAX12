@@ -122,7 +122,7 @@ class AX12:
         return ret
 
 
-    def move(self, position, callback):
+    def move(self, position, callback=lambda:None):
         assert(isinstance(position, float) or isinstance(position, int))
         assert(callable(callback))
 
