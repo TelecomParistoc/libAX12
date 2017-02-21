@@ -1,6 +1,6 @@
 TARGET = libAX12.so
 SRCS = ax12driver.c ax-comm.c
-HEADERS = $(addprefix src/, ${SRCS:.c=.h}) src/driver.h
+HEADERS = $(addprefix src/, ${SRCS:.c=.h})
 OBJECTS = $(addprefix build/,${SRCS:.c=.o})
 TESTS = tests/AX12position tests/AXcomm tests/AXmove
 JSBINDINGS := $(wildcard JSbinding/*.js)
@@ -52,6 +52,7 @@ install: build/$(TARGET) jsinstall AX12console
 	mkdir -p $(DESTDIR)$(PREFIX)/include/AX12
 	cp build/$(TARGET) $(DESTDIR)$(PREFIX)/lib/
 	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/AX12/
+	ln -s -f $(DESTDIR)$(PREFIX)/include/AX12/ax12driver.h  $(DESTDIR)$(PREFIX)/include/AX12/ax12.h
 	chmod 0755 $(DESTDIR)$(PREFIX)/lib/$(TARGET)
 	ldconfig
 	ldconfig -p | grep AX12
