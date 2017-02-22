@@ -9,11 +9,6 @@ program.version('0.1.0')
     .option('-b, --baudrate <n>', 'set AX12 communication baudrate (default 115200)', myParse, 115200)
     .parse(process.argv)
 
-# force baudrate
-stty = require('child_process').spawn('stty', ['-F', '/dev/ttyS0', program.baudrate+''])
-stty.stdout.on 'data', (data) ->
-  console.log("stdout: #{data}")
-
 commands = new Table({
   chars: { 'top': '' , 'top-mid': '' , 'top-left': '' , 'top-right': ''
          , 'bottom': '' , 'bottom-mid': '' , 'bottom-left': '' , 'bottom-right': ''
@@ -68,9 +63,13 @@ registersTable.push([('0x' + reg.address.toString(16).toUpperCase()).blue, name,
 context = ->
     colors = require __dirname + '/node_modules/colors'
     Table = require __dirname + '/node_modules/cli-table'
-    comm = require __dirname + '/../AX12/ax-comm.js'
+    comm = require __dirname + '/../walkingdriver/ax-comm.js'
 
     comm.init 115200
+    # force baudrate
+    stty = require('child_process').spawn('stty', ['-F', '/dev/ttyS0', baudrate])
+    stty.stdout.on 'data', (data) ->
+        console.log("stdout: #{data}")
 
     __checkID = (id) ->
             console.log 'ERROR : Wrong ID (must be between 0 and 253)'.red unless 0 <= id < 254
@@ -157,7 +156,7 @@ registersString = 'registers = ' + JSON.stringify(registers) + '\n'
 registersString += "#{name} = '#{name}'\n" for name, reg of registers
 registersString += "__dirname = '#{__dirname}'\n"
 evalLines = (context + '').split('\n')
-evalLines[0] = registersString
+evalLines[0] = registersString + "baudrate = #{program.baudrate}\n"
 evalLines.pop()
 evalLines.pop()
 

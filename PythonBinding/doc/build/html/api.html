@@ -1,0 +1,372 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API Documentation &#8212; LibAX12_Python_Binding  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to LibAX12_Python_Binding’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ax12driver.AX12">
+<em class="property">class </em><code class="descclassname">ax12driver.</code><code class="descname">AX12</code><span class="sig-paren">(</span><em>id</em>, <em>baudrate=115200</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12" title="Permalink to this definition">¶</a></dt>
+<dd><p>AX12 emulates a physical AX12 servomotor</p>
+<dl class="method">
+<dt id="ax12driver.AX12.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>id</em>, <em>baudrate=115200</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a new ‘AX12’ object and instanciates I2C_bus if needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> – The id of the AX12, must be between 0 and 255</li>
+<li><strong>baudrate</strong> – The baudrate to communicate with the AX12, defaults to 115200</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Returns nothing</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ax12driver.AX12.scan_i2c">
+<em class="property">classmethod </em><code class="descname">scan_i2c</code><span class="sig-paren">(</span><em>print_on_fly=None</em>, <em>baudrate=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.scan_i2c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists AX12 connected to the raspberry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of the id of the connected raspberry</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.ping">
+<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pings the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">0 if the ping succeeded, a negative error value else</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_status">
+<code class="descname">get_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the status of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">0 if everything is fine, a negative value in case of an error</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_position">
+<code class="descname">get_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current position of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The position in degree from -150 to 150 increasing clockwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_speed">
+<code class="descname">get_speed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current speed of the AX12, may be inaccurate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The speed in %, a positive value means a clockwise speed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_load">
+<code class="descname">get_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current load of the AX12, may be inaccurate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The load in %, a positive value means a clockwise load</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_voltage">
+<code class="descname">get_voltage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_voltage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current voltage of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The voltage in Volts</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.get_temperature">
+<code class="descname">get_temperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.get_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current temperature of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The temperature in Celcius degrees</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.is_moving">
+<code class="descname">is_moving</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.is_moving" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the AX12 is moving</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">1 if the AX12 is moving, 0 otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.set_mode">
+<code class="descname">set_mode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.set_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the mode of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> – 0 for default mode, 1 for wheel mode</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">0 in case of success, raises an exception otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.set_speed">
+<code class="descname">set_speed</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.set_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the speed of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> – A percentage, positive for a clockwise speed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">0 in case of success, raises an exception otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.set_torque">
+<code class="descname">set_torque</code><span class="sig-paren">(</span><em>torque</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.set_torque" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the torque limit of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>torque</strong> – A percentage, if 0 the AX12 won’t be able to move</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">0 in case of success, raises an exception otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.set_LED">
+<code class="descname">set_LED</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.set_LED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the LED state of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> – 1 to put the LED on, 0 to put the LED off</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">0 in case of success, raises an exception otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.move">
+<code class="descname">move</code><span class="sig-paren">(</span><em>position</em>, <em>callback=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orders the AX12 to move to a specified position</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>position</strong> – A position in degree from -150 to 150 increasing clockwise</li>
+<li><strong>callback</strong> – A function to be called at the end of the movement</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">0 in case of success, raises an exception otherwise</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.cancel_callback">
+<code class="descname">cancel_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.cancel_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancels the end move callback of the AX12</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ax12driver.AX12.turn">
+<code class="descname">turn</code><span class="sig-paren">(</span><em>speed</em><span class="sig-paren">)</span><a class="headerlink" href="#ax12driver.AX12.turn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orders the AX12 to turn at a constant speed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> – a percentage, positive for a clockwise speed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">0 in case of success, raises an exception otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">LibAX12_Python_Binding</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to LibAX12_Python_Binding’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, TelecomRobotics.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
