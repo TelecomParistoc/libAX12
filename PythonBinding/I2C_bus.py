@@ -55,6 +55,8 @@ def load_lib_ax12():
     l.AX12cancelCallback.restype= None
     l.AX12turn.restype          = ctypes.c_int
     l.AX12resetAll.restype       = None
+
+    return l
     
     
 
