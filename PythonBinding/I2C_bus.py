@@ -1,5 +1,5 @@
 import ctypes
-
+import sys
 
 class Initialisation_Error(Exception):
 
@@ -113,11 +113,19 @@ class I2C_bus:
         return int(lib_ax12.axPing(ctypes.c_int(id), ctypes.c_int(0)))
 
     @classmethod
-    def scan(cls, print_on_fly=None):
+    def scan(cls, print_enable=False):
         elems = []
+	if not print_enable:
+	    old_stdout = sys.stdout
+	    sys.stdout = open("/dev/null", "w")
+	    print "j'aime les babouches"
+
         for i in range(254):
             if I2C_bus.ping(i) == 0:
                 elems.append(i)
-                if callable(print_on_fly):
-                    print_on_fly(i)
+
+	if not print_enable:
+	    sys.stdout.close()
+	    sys.stdout = old_stdout
+
         return elems

@@ -35,8 +35,17 @@ def check_mode(m):
 
 
 class AX12:
-
+    """
+    AX12 emulates a physical AX12 servomotor
+    """
     def __init__(self, id, baudrate=115200):
+        """
+        Construct a new 'AX12' object and instanciates I2C_bus if needed
+
+        :param id: The id of the AX12, must be between 0 and 255
+        :param baudrate: The baudrate to communicate with the AX12, defaults to 115200
+        :return: returns nothing
+        """
         check_uint8(id)
         self.id = id
         if I2C_bus.instance is None:
