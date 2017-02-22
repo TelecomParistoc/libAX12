@@ -70,7 +70,7 @@ class I2C_bus:
     baudrate = None
 
     def __init__(self, baudrate=115200, init=True):
-        if I2C_bus.instance is not None:
+        if I2C_bus.instance is not None and init:
             print("[-] Uneffective new construction of I2C_bus, please use reset to change baudrate")
             return
         I2C_bus.instance = self
@@ -110,7 +110,7 @@ class I2C_bus:
     @classmethod
     def ping(cls, id):
         check_uint8(id)
-        return int(lib_ax12.axPing(ctypes.c_int(id)))
+        return int(lib_ax12.axPing(ctypes.c_int(id), ctypes.c_int(0)))
 
     @classmethod
     def scan(cls, print_on_fly=None):
