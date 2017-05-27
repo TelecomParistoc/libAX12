@@ -30,7 +30,37 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-lib_ax12 = ctypes.cdll.LoadLibrary(LIBNAME)
+
+
+def load_lib_ax12():
+    """
+        we must specify the return type for each function
+        because the default return type is c_int (and then automatically cast
+        to int)
+    """
+    l = ctypes.cdll.LoadLibrary(LIBNAME)
+
+    l.AX12getPosition.restype   = ctypes.c_double
+    l.AX12getSpeed.restype      = ctypes.c_double
+    l.AX12getLoad.restype       = ctypes.c_double
+    l.AX12getStatus.restype     = ctypes.c_int
+    l.AX12getVoltage.restype    = ctypes.c_double
+    l.AX12getTemperature.restype= ctypes.c_int
+    l.AX12isMoving.restype      = ctypes.c_int
+    l.AX12setMode.restype       = ctypes.c_int
+    l.AX12setSpeed.restype      = ctypes.c_int
+    l.AX12setTorque.restype     = ctypes.c_int
+    l.AX12setLED.restype        = ctypes.c_int
+    l.AX12move.restype          = ctypes.c_int
+    l.AX12cancelCallback.restype= None
+    l.AX12turn.restype          = ctypes.c_int
+    l.AX12resetAll.restype       = None
+
+    return l
+    
+    
+
+lib_ax12 = load_lib_ax12()
 
 class I2C_bus:
 
@@ -40,7 +70,7 @@ class I2C_bus:
     baudrate = None
 
     def __init__(self, baudrate=115200, init=True):
-        if I2C_bus.instance is not None:
+        if I2C_bus.instance is not None and init:
             print("[-] Uneffective new construction of I2C_bus, please use reset to change baudrate")
             return
         I2C_bus.instance = self
@@ -80,7 +110,7 @@ class I2C_bus:
     @classmethod
     def ping(cls, id):
         check_uint8(id)
-        return int(lib_ax12.axPing(ctypes.c_int(id)))
+        return int(lib_ax12.axPing(ctypes.c_int(id), ctypes.c_int(0)))
 
     @classmethod
     def scan(cls, print_on_fly=None):

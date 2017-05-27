@@ -74,4 +74,4 @@ for more info.
 
 ### Python ###
 
-Not as fun as JS but some programmers seems to use it anyway ...
+Most of the valuable programmers don't hesitate to trash javascript and to prefer a language which allows doing everything like python. That's why a simple python binding is provided (sudo make pythoninstall).
