@@ -18,10 +18,10 @@ class Communication_Error(Exception):
     errors = ["No error", "Serial port not initialized", "Wrong checksum", "Target and answer ID mismatch", "Timeout", "Callback buffer is full"]
 
     def __init__(self, index):
-        if index>=len(errors) or index<0:
+        if index>=len(Communication_Error.errors) or index<0:
             self.msg = "No error matching return code"
         else:
-            self.msg = Communication_Exception.errors[index]
+            self.msg = Communication_Error.errors[index]
 
     def __str__(self):
         return self.msg
@@ -63,19 +63,19 @@ class AX12:
 
 
     def get_position(self):
-        return float(lib_ax12.AX12getPosition(ctypes.c_uint8(self.id)))
+        return lib_ax12.AX12getPosition(ctypes.c_uint8(self.id))
 
 
     def get_speed(self):
-        return float(lib_ax12.AX12getSpeed(ctypes.c_uint8(self.id)))
+        return lib_ax12.AX12getSpeed(ctypes.c_uint8(self.id))
 
 
     def get_load(self):
-        return float(lib_ax12.AX12getLoad(ctypes.c_uint8(self.id)))
+        return lib_ax12.AX12getLoad(ctypes.c_uint8(self.id))
 
 
     def get_voltage(self):
-        return float(lib_ax12.AX12getVoltage(ctypes.c_uint8(self.id)))
+        return lib_ax12.AX12getVoltage(ctypes.c_uint8(self.id))
 
 
     def get_temperature(self):
