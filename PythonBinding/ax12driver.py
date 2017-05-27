@@ -59,7 +59,7 @@ class AX12:
 
 
     def get_status(self):
-        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id))))
+        return int(lib_ax12.AX12getStatus(ctypes.c_uint8(self.id)))
 
 
     def get_position(self):
@@ -71,42 +71,42 @@ class AX12:
 
 
     def get_load(self):
-        return float(lib_ax12.AX12getLoad(ctypes.c_uint8((self.id))))
+        return float(lib_ax12.AX12getLoad(ctypes.c_uint8(self.id)))
 
 
     def get_voltage(self):
-        return float(lib_ax12.AX12getVoltage(ctypes.c_uint8((self.id))))
+        return float(lib_ax12.AX12getVoltage(ctypes.c_uint8(self.id)))
 
 
     def get_temperature(self):
-        return int(lib_ax12.AX12getTemperature(ctypes.c_uint8((self.id))))
+        return int(lib_ax12.AX12getTemperature(ctypes.c_uint8(self.id)))
 
 
     def is_moving(self):
-        return int(lib_ax12.AX12isMoving(ctypes.c_uint8((self.id))))
+        return int(lib_ax12.AX12isMoving(ctypes.c_uint8(self.id)))
 
 
     def set_mode(self, mode):
         check_mode(mode)
 
-        ret = int(lib_ax12.AX12setMode(ctypes.c_uint8((self.id),
-                                       ctypes.c_int(mode))))
+        ret = int(lib_ax12.AX12setMode(ctypes.c_uint8(self.id),
+                                       ctypes.c_int(mode)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
 
 
     def set_speed(self, speed):
-        ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8((self.id),
-                                        ctypes.c_double(speed))))
+        ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8(self.id),
+                                        ctypes.c_double(speed)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
 
 
     def set_torque(self, torque):
-        ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8((self.id),
-                                         ctypes.c_double(torque))))
+        ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8(self.id),
+                                         ctypes.c_double(torque)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
@@ -115,32 +115,34 @@ class AX12:
     def set_LED(self, state):
         assert(isinstance(state, int))
 
-        ret = int(lib_ax12.AX12setLED(ctypes.c_uint8((self.id),
-                                      ctypes.c_int(state))))
+        ret = int(lib_ax12.AX12setLED(ctypes.c_uint8(self.id),
+                                      ctypes.c_int(state)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
 
 
     def move(self, position, callback):
-        assert(isinstance(position, float))
+        assert(isinstance(position, float) or isinstance(position, int))
         assert(callable(callback))
 
-        ret = int(lib_ax12.AX12move(ctypes.c_uint8((self.id),
+        ret = int(lib_ax12.AX12move(ctypes.c_uint8(self.id),
                                     ctypes.c_double(position),
-                                    encapsulate_callback(callback))))
+                                    encapsulate_callback(callback)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
 
 
     def cancel_callback(self):
-        lib_ax12.AX12CancelCallback(ctypes.c_uint8((self.id)))
+        lib_ax12.AX12CancelCallback(ctypes.c_uint8(self.id))
 
 
     def turn(self, speed):
-        ret = int(lib_ax12.AX12turn(ctypes.c_uint8((self.id),
-                                    ctypes.c_int(speed))))
+        assert(isinstance(speed, float) or isinstance(speed, int))
+
+        ret = int(lib_ax12.AX12turn(ctypes.c_uint8(self.id),
+                                    ctypes.c_int(speed)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret

@@ -37,6 +37,7 @@ class I2C_bus:
     __metaclass__ = Singleton
 
     instance = None
+    baudrate = None
 
     def __init__(self, baudrate=115200, init=True):
         if I2C_bus.instance is not None:
@@ -45,12 +46,13 @@ class I2C_bus:
         I2C_bus.instance = self
 
         self.baudrate = baudrate
+        I2C_bus.baudrate = baudrate
         if init:
             I2C_bus.init(baudrate)
 
 
     @classmethod
-    def init(cls, baudrate):
+    def init(cls, baudrate=115200):
         assert(isinstance(baudrate, int))
         assert(7343 <= baudrate <= 1000000)
 
@@ -58,7 +60,7 @@ class I2C_bus:
         if ret<0:
             raise Initialisation_Error(-error)
 
-        self.instance = I2C_bus(baudrate, False)
+        cls.instance = I2C_bus(baudrate, False)
 
         return ret
 
