@@ -142,7 +142,7 @@ class AX12:
         assert(isinstance(speed, float) or isinstance(speed, int))
 
         ret = int(lib_ax12.AX12turn(ctypes.c_uint8(self.id),
-                                    ctypes.c_int(speed)))
+                                    ctypes.c_double(speed)))
         if ret<0:
             raise Communication_Error(-ret)
         return ret
