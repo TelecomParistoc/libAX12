@@ -11,6 +11,7 @@
 from encapsulate_callback import encapsulate_callback
 from I2C_bus import *
 
+from time import sleep
 
 
 class Communication_Error(Exception):
@@ -53,6 +54,8 @@ class AX12:
         elif I2C_bus.baudrate != baudrate:
             print "[.] Baudrate used to communicate with AX12 id "+str(id)+" ("+str(baudrate)+") does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
             I2C_bus(baudrate)
+
+        self.move(self.get_position())    
 
 
     @classmethod
