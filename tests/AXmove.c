@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define AX12_ID 163
+#define AX12_ID 135
 
 /* Test AX12 move callback */
 void onHigh();
