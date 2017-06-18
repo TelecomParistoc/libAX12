@@ -78,17 +78,8 @@ Bindings are provided to use libAX12 with other languages than C/C++.
 
 Most of the reasonable programmers use and love Javascript/Coffeescript.
 That's why a simple JS binding is provided, allowing to call AX12 driver functions
-with a similar API. Check [ax12driver.js](https://github.com/TelecomParistoc/libAX12/blob/master/JSbinding/ax12driver.js)
+from javascript. Check [JSbinding/README.md](https://github.com/TelecomParistoc/libAX12/blob/master/JSbinding/README.md)
 for more info.
-
-To use it, after having installed libAX12 you need to create link to the
-module in your local node_modules directory :
-
-```
-ln -s /usr/local/lib/node_modules/AX12/ node_modules/
-```
-
-Then just include it like a regular module like `var ax12 = require('AX12');`.
 
 ### Python ###
 
