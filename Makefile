@@ -6,7 +6,7 @@ TESTS = tests/timing tests/AX12position tests/AXcomm tests/AXmove
 JSBINDINGS := $(wildcard JSbinding/*.js)
 CC=gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
-LDFLAGS= -shared -lwiringPi -lm
+LDFLAGS= -shared -lwiringPi -lm -lrobotutils
 PREFIX = /usr/local
 VPATH = build/
 

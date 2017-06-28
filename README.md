@@ -9,10 +9,10 @@ An example of such electronics can be found [here](https://github.com/TelecomPar
 
 This library is designed for Raspberry Pi with Raspbian.
 
-* First, you need [wiringPi](http://wiringpi.com/download-and-install/),
-if you don't have it already.
+* First, you need [wiringPi](http://wiringpi.com/download-and-install/) and
+[librobotutils](https://github.com/TelecomParistoc/librobotutils).
 
-* Once wiringPi is installed, get back the sources :
+* Once dependencies are installed, get back the sources :
 `git clone git@github.com:TelecomParistoc/libAX12.git`
 
 * cd to the root of the repository and enter `make`
@@ -24,7 +24,7 @@ if you don't have it already.
 Don't forget to compile (actually, link) your C/C++ app with `-lAX12` option.
 You can include all the headers you need with :
 ```c
-#include "AX12/driver.h"
+#include <AX12/driver.h>
 ```
 It is also possible to include headers individually.
 
@@ -41,15 +41,6 @@ access to the whole AX12 memory (see below).
 
 For more info on AX12 driver API, see
 [ax12driver.h](https://github.com/TelecomParistoc/libAX12/blob/master/src/ax12driver.h).
-
-
-### Time utility functions ###
-
-Some functions are required by the AX12 driver to handle synchronous and asynchronous
-delays. As a bonus, these are made available to the user.
-
-For more info on timing API, see
-[timing.h](https://github.com/TelecomParistoc/libAX12/blob/master/src/timing.h).
 
 
 ## AX12 console utility ##
