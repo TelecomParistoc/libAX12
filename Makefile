@@ -1,8 +1,8 @@
 TARGET = libAX12.so
-SRCS = timing.c ax12driver.c ax-comm.c
+SRCS = ax12driver.c ax-comm.c
 HEADERS = $(addprefix src/, ${SRCS:.c=.h}) src/driver.h
 OBJECTS = $(addprefix build/,${SRCS:.c=.o})
-TESTS = tests/timing tests/AX12position tests/AXcomm tests/AXmove
+TESTS = tests/AX12position tests/AXcomm tests/AXmove
 JSBINDINGS := $(wildcard JSbinding/*.js)
 CC=gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
@@ -15,7 +15,7 @@ vpath %.h src/
 
 .PHONY: all build clean tests AX12console jsinstall
 
-all: build build/$(TARGET) tests
+all: build build/$(TARGET)
 
 build:
 	@mkdir -p build
