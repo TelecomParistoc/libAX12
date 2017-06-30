@@ -29,7 +29,6 @@ def check_mode(m):
 
 
 def init_AX12(baudrate):
-
     assert(isinstance(baudrate, int))
     assert (7343 <= baudrate <= 1000000)
 
@@ -38,37 +37,39 @@ def init_AX12(baudrate):
 
 
 def AX12_get_position(identifiant):
-
     check_uint8(identifiant)
     return float(lib_ax12.AX12getPosition(ctypes.c_uint8(identifiant)))
 
 
 def AX12_get_speed(identifiant):
-
     check_uint8(identifiant)
     return float(lib_ax12.AX12getSpeed(ctypes.c_uint8(identifiant)))
 
 
 def AX12_get_load(identifiant):
-
     check_uint8(identifiant)
     return float(lib_ax12.AX12getLoad(ctypes.c_uint8(identifiant)))
+
 
 def AX12_get_status(identifiant):
     check_uint8(identifiant)
     return int(lib_ax12.AX12getStatus(ctypes.c_uint8(identifiant)))
 
+
 def AX12_get_voltage(identifiant):
     check_uint8(identifiant)
     return float(lib_ax12.AX12getVoltage(ctypes.c_uint8(identifiant)))
+
 
 def AX12_get_temperature(identifiant):
     check_uint8(identifiant)
     return int(lib_ax12.AX12getTemperature(ctypes.c_uint8(identifiant)))
 
+
 def AX12_is_moving(identifiant):
     check_uint8(identifiant)
     return int(lib_ax12.AX12isMoving(ctypes.c_uint8(identifiant)))
+
 
 def AX12_set_mode(identifiant, mode):
     check_uint8(identifiant)
@@ -76,15 +77,18 @@ def AX12_set_mode(identifiant, mode):
     return int(lib_ax12.AX12setMode(ctypes.c_uint8(identifiant),
                                     ctypes.c_int(mode)))
 
+
 def AX12_set_speed(identifiant, speed):
     check_uint8(identifiant)
     return int(lib_ax12.AX12setSpeed(ctypes.c_uint8(identifiant),
                                      ctypes.c_double(speed)))
 
+
 def AX12_set_torque(identifiant, torque):
     check_uint8(identifiant)
     return int(lib_ax12.AX12setTorque(ctypes.c_uint8(identifiant),
                                       ctypes.c_double(torque)))
+
 
 def AX12_set_LED(identifiant, state):
     assert(isinstance(state, int))
@@ -94,7 +98,10 @@ def AX12_set_LED(identifiant, state):
 
 
 def AX12_move(identifiant, position, callback):
+    check_uint8(identifiant)
+    assert(isinstance(position, float))
+    assert(callable(callback))
     #ohoh ca va etre plus dur...
     #en fait, on ne va pas appeler AX12_move de ax12driver, mais une fonction
-    #"interfacee", 
+    #"interfacee",
     pass
