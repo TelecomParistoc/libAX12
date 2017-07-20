@@ -1,20 +1,19 @@
-TARGET = libmotors.so
-SRCS = motordriver.c motion.c queue.c
-HEADERS = $(addprefix src/, ${SRCS:.c=.h}) src/driver.h
+TARGET = libAX12.so
+SRCS = ax12driver.c ax-comm.c
+HEADERS = $(addprefix src/, ${SRCS:.c=.h})
 OBJECTS = $(addprefix build/,${SRCS:.c=.o})
-TESTS = tests/simplemoves tests/absolute
-
+TESTS = tests/AX12position tests/AXcomm tests/AXmove
+JSBINDINGS := $(wildcard JSbinding/*.js)
 CC=gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
-LDFLAGS= -shared -lwiringPi -lm -lpthread -lrobotutils
+LDFLAGS= -shared -lwiringPi -lm -lrobotutils
 PREFIX = /usr/local
 VPATH = build/
 
 vpath %.c src/ tests/
 vpath %.h src/
 
-.PHONY: all build clean tests jsinstall motorconf
-
+.PHONY: all build clean tests AX12console jsinstall
 
 all: build build/$(TARGET)
 
@@ -30,36 +29,32 @@ build/$(TARGET): $(OBJECTS)
 	@echo "\nLinking target $@"
 	@$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
 
-tests: LDFLAGS=-lmotors -lrobotutils
+tests: LDFLAGS=-lAX12
 tests: $(TESTS)
-
-tests/%: tests/%.o
-	$(CC) $(LDFLAGS) $^ -o $@
 
 clean:
 	rm -f build/*.o build/*.so build/*.d
-	rm -f $(TESTS) tests/*.o
+	rm -f $(TESTS)
 
-jsinstall:
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/node_modules/motors
-	cp -r JSbinding/* $(DESTDIR)$(PREFIX)/lib/node_modules/motors
-	cd $(DESTDIR)$(PREFIX)/lib/node_modules/motors; npm install
+jsinstall: $(JSBINDINGS) JSbinding/package.json
+	mkdir -p $(DESTDIR)$(PREFIX)/lib/node_modules/AX12
+	cp -r JSbinding/* $(DESTDIR)$(PREFIX)/lib/node_modules/AX12
+	cd $(DESTDIR)$(PREFIX)/lib/node_modules/AX12; npm install
+AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
+	mkdir -p $(DESTDIR)$(PREFIX)/lib/node_modules/AX12console
+	cp -r AX12console/* $(DESTDIR)$(PREFIX)/lib/node_modules/AX12console
+	cd $(DESTDIR)$(PREFIX)/lib/node_modules/AX12console; npm install
+	cp AX12console/AX12 $(DESTDIR)$(PREFIX)/bin/
+	chmod a+x $(DESTDIR)$(PREFIX)/bin/AX12
 
-motorconf:
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/node_modules/motorconf
-	cp -r motorconf/* $(DESTDIR)$(PREFIX)/lib/node_modules/motorconf
-	cd $(DESTDIR)$(PREFIX)/lib/node_modules/motorconf; npm install
-	ln -s $(DESTDIR)$(PREFIX)/lib/node_modules/motors $(DESTDIR)$(PREFIX)/lib/node_modules/motorconf/node_modules/motors
-	cp motorconf/motorconf $(DESTDIR)$(PREFIX)/bin/
-	chmod a+x $(DESTDIR)$(PREFIX)/bin/motorconf
-
-install: build/$(TARGET) jsinstall motorconf
+install: build/$(TARGET) jsinstall AX12console
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
-	mkdir -p $(DESTDIR)$(PREFIX)/include/motors
+	mkdir -p $(DESTDIR)$(PREFIX)/include/AX12
 	cp build/$(TARGET) $(DESTDIR)$(PREFIX)/lib/
-	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/motors/
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/AX12/
+	ln -s -f $(DESTDIR)$(PREFIX)/include/AX12/ax12driver.h  $(DESTDIR)$(PREFIX)/include/AX12/ax12.h
 	chmod 0755 $(DESTDIR)$(PREFIX)/lib/$(TARGET)
 	ldconfig
-	ldconfig -p | grep motors
+	ldconfig -p | grep AX12
 
 -include $(subst .c,.d,$(SRCS))
