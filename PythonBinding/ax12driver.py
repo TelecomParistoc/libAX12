@@ -101,7 +101,22 @@ def AX12_move(identifiant, position, callback):
     check_uint8(identifiant)
     assert(isinstance(position, float))
     assert(callable(callback))
-    #ohoh ca va etre plus dur...
-    #en fait, on ne va pas appeler AX12_move de ax12driver, mais une fonction
-    #"interfacee",
-    pass
+
+    lib_ax12.AX12move(ctypes.c_uint8(identifiant), ctypes.c_double(position),
+                      ctypes.CFUNCTYPE(None)(callback))
+
+def AX12cancelCallback(identifiant):
+    check_uint8(identifiant)
+    lib_ax12.AX12cancelCallback(ctypes.c_uint8(identifiant))
+
+
+
+def AX12turn(identifiant, speed):
+    check_uint8(identifiant)
+    assert(isinstance(speed, float))
+
+    return lib_ax12.AX12turn(ctypes.c_uint8(identifiant), ctypes.c_double(speed))
+
+def AX12resetAll():
+    lib_ax12.resetAll()
+    
