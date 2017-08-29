@@ -13,7 +13,7 @@ LOCAL_PYTHON = AX12.py
 CC = gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
 LDFLAGS= -shared -lwiringPi -lm -lrobotutils
-PREFIX = /usr/local
+PREFIX = /usr/local/
 VPATH = build/
 
 vpath %.c src/ tests/
@@ -55,7 +55,7 @@ AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
 
 pythoninstall:
 	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON)
-	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "w+").write(content)';
+	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "w+").write(content)';
 
 install: build/$(TARGET) jsinstall AX12console pythoninstall
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
