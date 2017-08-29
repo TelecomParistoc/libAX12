@@ -3,8 +3,14 @@ SRCS = ax12driver.c ax-comm.c
 HEADERS = $(addprefix src/, ${SRCS:.c=.h})
 OBJECTS = $(addprefix build/,${SRCS:.c=.o})
 TESTS = tests/AX12position tests/AXcomm tests/AXmove
+
 JSBINDINGS := $(wildcard JSbinding/*.js)
-CC=gcc
+
+PYTHON_BINDING = PythonBinding/ax12driver.py
+PYTHON_PREFIX = /usr/local/lib/python2.7/dist-packages/
+LOCAL_PYTHON = AX12.py
+
+CC = gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
 LDFLAGS= -shared -lwiringPi -lm -lrobotutils
 PREFIX = /usr/local
@@ -47,7 +53,11 @@ AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
 	cp AX12console/AX12 $(DESTDIR)$(PREFIX)/bin/
 	chmod a+x $(DESTDIR)$(PREFIX)/bin/AX12
 
-install: build/$(TARGET) jsinstall AX12console
+pythoninstall:
+	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON)
+	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "w+").write(content)';
+
+install: build/$(TARGET) jsinstall AX12console pythoninstall
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/AX12
 	cp build/$(TARGET) $(DESTDIR)$(PREFIX)/lib/

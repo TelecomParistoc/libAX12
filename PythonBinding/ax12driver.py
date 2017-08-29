@@ -8,11 +8,11 @@
 # verifie aussi la coherence en fonction des parametres physiques de la datasheet
 
 
-
+from encapsulate_callback import encapsulate_callback
 import ctypes
 
 
-lib_ax12 = ctypes.cdll.LoadLibrary("where is my lib mom ?")
+lib_ax12 = ctypes.cdll.LoadLibrary(LIBNAME)
 
 
 DEFAULT_MODE    =   0
@@ -33,7 +33,6 @@ def init_AX12(baudrate):
     assert (7343 <= baudrate <= 1000000)
 
     return int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
-
 
 
 def AX12_get_position(identifiant):
@@ -102,21 +101,6 @@ def AX12_move(identifiant, position, callback):
     assert(isinstance(position, float))
     assert(callable(callback))
 
-    lib_ax12.AX12move(ctypes.c_uint8(identifiant), ctypes.c_double(position),
-                      ctypes.CFUNCTYPE(None)(callback))
-
-def AX12cancelCallback(identifiant):
-    check_uint8(identifiant)
-    lib_ax12.AX12cancelCallback(ctypes.c_uint8(identifiant))
-
-
-
-def AX12turn(identifiant, speed):
-    check_uint8(identifiant)
-    assert(isinstance(speed, float))
-
-    return lib_ax12.AX12turn(ctypes.c_uint8(identifiant), ctypes.c_double(speed))
-
-def AX12resetAll():
-    lib_ax12.resetAll()
-    
+    return int(lib_ax12.AX12move(ctypes.c_uint8(identifiant),
+                                 ctypes.c_double(position),
+                                 encapsulate_callback(callback)))
