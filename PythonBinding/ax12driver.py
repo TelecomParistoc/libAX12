@@ -12,6 +12,34 @@ from encapsulate_callback import encapsulate_callback
 import ctypes
 
 
+class Initialisation_Error(Exception):
+
+    errors = ["Success", "Cannot open AX12 serial port", "Cannot create mutex"]
+
+    def __init__(self, index):
+        if index>=len(errors) or index<0:
+            self.msg = "No error matching return code"
+        else:
+            self.msg = Communication_Exception.errors[index]
+
+    def __str__(self):
+        return self.msg
+
+
+class Communication_Error(Exception):
+
+    errors = ["No error", "Serial port not initialized", "Wrong checksum", "Target and answer ID mismatch", "Timeout", "Callback buffer is full"]
+
+    def __init__(self, index):
+        if index>=len(errors) or index<0:
+            self.msg = "No error matching return code"
+        else:
+            self.msg = Communication_Exception.errors[index]
+
+    def __str__(self):
+        return self.msg
+
+
 lib_ax12 = ctypes.cdll.LoadLibrary(LIBNAME)
 
 
@@ -32,7 +60,10 @@ def init_AX12(baudrate):
     assert(isinstance(baudrate, int))
     assert (7343 <= baudrate <= 1000000)
 
-    return int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
+    ret = int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
+    if ret<0:
+        raise Initialisation_Error(-ret)
+    return ret
 
 
 def AX12_get_position(identifiant):
@@ -73,27 +104,42 @@ def AX12_is_moving(identifiant):
 def AX12_set_mode(identifiant, mode):
     check_uint8(identifiant)
     check_mode(mode)
-    return int(lib_ax12.AX12setMode(ctypes.c_uint8(identifiant),
-                                    ctypes.c_int(mode)))
+
+    ret = int(lib_ax12.AX12setMode(ctypes.c_uint8(identifiant),
+                                   ctypes.c_int(mode)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
 
 
 def AX12_set_speed(identifiant, speed):
     check_uint8(identifiant)
-    return int(lib_ax12.AX12setSpeed(ctypes.c_uint8(identifiant),
-                                     ctypes.c_double(speed)))
+
+    ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8(identifiant),
+                                    ctypes.c_double(speed)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
 
 
 def AX12_set_torque(identifiant, torque):
     check_uint8(identifiant)
-    return int(lib_ax12.AX12setTorque(ctypes.c_uint8(identifiant),
-                                      ctypes.c_double(torque)))
+
+    ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8(identifiant),
+                                     ctypes.c_double(torque)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
 
 
 def AX12_set_LED(identifiant, state):
     assert(isinstance(state, int))
 
-    return int(lib_ax12.AX12setLED(ctypes.c_uint8(identifiant),
-                                   ctypes.c_int(state)))
+    ret = int(lib_ax12.AX12setLED(ctypes.c_uint8(identifiant),
+                                  ctypes.c_int(state)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
 
 
 def AX12_move(identifiant, position, callback):
@@ -101,9 +147,12 @@ def AX12_move(identifiant, position, callback):
     assert(isinstance(position, float))
     assert(callable(callback))
 
-    return int(lib_ax12.AX12move(ctypes.c_uint8(identifiant),
-                                 ctypes.c_double(position),
-                                 encapsulate_callback(callback)))
+    ret = int(lib_ax12.AX12move(ctypes.c_uint8(identifiant),
+                                ctypes.c_double(position),
+                                encapsulate_callback(callback)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
 
 
 def AX12_cancel_callback(identifiant):
@@ -113,4 +162,9 @@ def AX12_cancel_callback(identifiant):
 
 def AX12_turn(identifiant, speed):
     check_uint8(identifiant)
-    return lib_ax12.AX12turn(ctypes.c_uint8(identifiant), ctypes.c_double(speed))
+
+    ret = int(lib_ax12.AX12turn(ctypes.c_uint8(identifiant),
+                                ctypes.c_int(speed)))
+    if ret<0:
+        raise Communication_Error(-ret)
+    return ret
