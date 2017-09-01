@@ -104,3 +104,13 @@ def AX12_move(identifiant, position, callback):
     return int(lib_ax12.AX12move(ctypes.c_uint8(identifiant),
                                  ctypes.c_double(position),
                                  encapsulate_callback(callback)))
+
+
+def AX12_cancel_callback(identifiant):
+    check_uint8(identifiant)
+    lib_ax12.AX12CancelCallback(ctypes.c_uint8(identifiant))
+
+
+def AX12_turn(identifiant, speed):
+    check_uint8(identifiant)
+    return lib_ax12.AX12turn(ctypes.c_uint8(identifiant), ctypes.c_double(speed))
