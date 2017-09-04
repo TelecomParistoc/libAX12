@@ -58,35 +58,35 @@ class AX12:
         return I2C_bus.ping(self.id)
 
 
+    def get_status(self):
+        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id)))
+    
+
     def get_position(self):
         return float(lib_ax12.AX12getPosition(ctypes.c_uint8(self.id)))
 
 
-    def AX12_get_speed(self):
+    def get_speed(self):
         return float(lib_ax12.AX12getSpeed(ctypes.c_uint8(self.id)))
 
 
-    def AX12_get_load(self):
+    def get_load(self):
         return float(lib_ax12.AX12getLoad(ctypes.c_uint8((self.id)))
 
 
-    def AX12_get_status(self):
-        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id)))
-
-
-    def AX12_get_voltage(self):
+    def get_voltage(self):
         return float(lib_ax12.AX12getVoltage(ctypes.c_uint8((self.id)))
 
 
-    def AX12_get_temperature(self):
+    def get_temperature(self):
         return int(lib_ax12.AX12getTemperature(ctypes.c_uint8((self.id)))
 
 
-    def AX12_is_moving(self):
+    def is_moving(self):
         return int(lib_ax12.AX12isMoving(ctypes.c_uint8((self.id)))
 
 
-    def AX12_set_mode(self, mode):
+    def set_mode(self, mode):
         check_mode(mode)
 
         ret = int(lib_ax12.AX12setMode(ctypes.c_uint8((self.id),
@@ -96,7 +96,7 @@ class AX12:
         return ret
 
 
-    def AX12_set_speed(self, speed):
+    def set_speed(self, speed):
         ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8((self.id),
                                         ctypes.c_double(speed)))
         if ret<0:
@@ -104,7 +104,7 @@ class AX12:
         return ret
 
 
-    def AX12_set_torque(self, torque):
+    def set_torque(self, torque):
         ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8((self.id),
                                          ctypes.c_double(torque)))
         if ret<0:
@@ -112,7 +112,7 @@ class AX12:
         return ret
 
 
-    def AX12_set_LED(self, state):
+    def set_LED(self, state):
         assert(isinstance(state, int))
 
         ret = int(lib_ax12.AX12setLED(ctypes.c_uint8((self.id),
@@ -122,7 +122,7 @@ class AX12:
         return ret
 
 
-    def AX12_move(self, position, callback):
+    def move(self, position, callback):
         assert(isinstance(position, float))
         assert(callable(callback))
 
@@ -134,11 +134,11 @@ class AX12:
         return ret
 
 
-    def AX12_cancel_callback(self):
+    def cancel_callback(self):
         lib_ax12.AX12CancelCallback(ctypes.c_uint8((self.id))
 
 
-    def AX12_turn(self, speed):
+    def turn(self, speed):
         ret = int(lib_ax12.AX12turn(ctypes.c_uint8((self.id),
                                     ctypes.c_int(speed)))
         if ret<0:
