@@ -47,11 +47,10 @@ class I2C_bus:
         I2C_bus.instance = self
         print "Testing : "+repr(self)
 
-        ret = int(lib_ax12.initAX12(ctypes.c_int(self.baudrate)))
-        if ret<0:
+        error = int(lib_ax12.initAX12(ctypes.c_int(self.baudrate)))
+        if error<0:
             raise Initialisation_Error(-ret)
 
-        return ret
 
     @classmethod
     def ping(cls, id):
@@ -62,7 +61,7 @@ class I2C_bus:
     def scan(cls, print_on_fly=None):
         elems = []
         for i in range(254):
-            if self.ping(i) == 0:
+            if I2C_bus.ping(i) == 0:
                 elems.append(i)
                 if callable(print_on_fly):
                     print_on_fly(i)
