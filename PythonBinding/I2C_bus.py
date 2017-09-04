@@ -53,11 +53,13 @@ class I2C_bus:
 
         return ret
 
-    def ping(self, id):
+    @classmethod
+    def ping(cls, id):
         assert(check_uint8(id))
         return int(lib_ax12.axPing(ctypes.c_int(id)))
 
-    def scan(self, print_on_fly=None):
+    @classmethod
+    def scan(cls, print_on_fly=None):
         elems = []
         for i in range(254):
             if self.ping(i) == 0:

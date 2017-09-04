@@ -51,11 +51,11 @@ class AX12:
         if I2C_bus.instance is None:
             print "[-] Unable to scan I2C bus because not initialized"
         else:
-            I2C_bus.instance.scan(print_on_fly)
+            I2C_bus.scan(print_on_fly)
 
 
     def ping(self):
-        return I2C_bus.instance.ping(self.id)
+        return I2C_bus.ping(self.id)
 
 
     def get_position(self):
