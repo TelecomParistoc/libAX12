@@ -6,7 +6,7 @@ print a.get_status()
 print a.get_position()
 
 b = I2C_bus(9600)
-I2C_bus.init_i2c(115200)
+I2C_bus.init(115200)
 c = I2C_bus(100000)
 d = I2C_bus(209302)
 d.reset(115200)

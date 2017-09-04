@@ -50,7 +50,7 @@ class I2C_bus:
 
 
     @classmethod
-    def init_i2c(cls, baudrate):
+    def init(cls, baudrate):
         assert(isinstance(baudrate, int))
         assert(7343 <= baudrate <= 1000000)
 
