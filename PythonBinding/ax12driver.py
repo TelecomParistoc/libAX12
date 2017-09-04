@@ -59,8 +59,8 @@ class AX12:
 
 
     def get_status(self):
-        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id)))
-    
+        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id))))
+
 
     def get_position(self):
         return float(lib_ax12.AX12getPosition(ctypes.c_uint8(self.id)))
