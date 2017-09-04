@@ -45,16 +45,15 @@ class I2C_bus:
         assert(7343 <= baudrate <= 1000000)
 
         I2C_bus.instance = self
-        print "Testing : "+repr(self)
 
         error = int(lib_ax12.initAX12(ctypes.c_int(self.baudrate)))
         if error<0:
-            raise Initialisation_Error(-ret)
+            raise Initialisation_Error(-error)
 
 
     @classmethod
     def ping(cls, id):
-        assert(check_uint8(id))
+        check_uint8(id)
         return int(lib_ax12.axPing(ctypes.c_int(id)))
 
     @classmethod
