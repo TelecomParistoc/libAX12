@@ -27,6 +27,7 @@ class Singleton(type):
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        print "Returning "+repr(cls._instances[cls])
         return cls._instances[cls]
 
 
@@ -49,6 +50,8 @@ class I2C_bus:
         error = int(lib_ax12.initAX12(ctypes.c_int(self.baudrate)))
         if error<0:
             raise Initialisation_Error(-error)
+
+        print I2C_bus.instance.baudrate
 
 
     @classmethod
