@@ -9,21 +9,8 @@
 
 
 from encapsulate_callback import encapsulate_callback
-import ctypes
+from I2C_bus import *
 
-
-class Initialisation_Error(Exception):
-
-    errors = ["Success", "Cannot open AX12 serial port", "Cannot create mutex"]
-
-    def __init__(self, index):
-        if index>=len(errors) or index<0:
-            self.msg = "No error matching return code"
-        else:
-            self.msg = Communication_Exception.errors[index]
-
-    def __str__(self):
-        return self.msg
 
 
 class Communication_Error(Exception):
@@ -40,131 +27,120 @@ class Communication_Error(Exception):
         return self.msg
 
 
-lib_ax12 = ctypes.cdll.LoadLibrary(LIBNAME)
-
 
 DEFAULT_MODE    =   0
 WHEEL_MODE      =   1
-
-
-def check_uint8(x):
-    assert (isinstance(x, int))
-    assert (0 <= identifiant <= 255)
-
-
 def check_mode(m):
     assert (m in [DEFAULT_MODE, WHEEL_MODE])
 
 
-def init_AX12(baudrate):
-    assert(isinstance(baudrate, int))
-    assert (7343 <= baudrate <= 1000000)
+class AX12:
 
-    ret = int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
-    if ret<0:
-        raise Initialisation_Error(-ret)
-    return ret
-
-
-def AX12_get_position(identifiant):
-    check_uint8(identifiant)
-    return float(lib_ax12.AX12getPosition(ctypes.c_uint8(identifiant)))
+    def __init__(self, id, baudrate=115200):
+        check_uint8(id)
+        self.id = id
+        if I2C_bus.instance is None:
+            I2C_bus(baudrate)
+        elif I2C_bus.baudrate != baudrate:
+            print "[.] Baudrate used to communicate with AX12 id "+str(id)+" ("+str(baudrate)+") does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
+            I2C_bus(baudrate)
 
 
-def AX12_get_speed(identifiant):
-    check_uint8(identifiant)
-    return float(lib_ax12.AX12getSpeed(ctypes.c_uint8(identifiant)))
+    @classmethod
+    def scan_i2c(cls, print_on_fly=None):
+        if I2C_bus.instance is None:
+            print "[-] Unable to scan I2C bus because not initialized"
+        else:
+            I2C_bus.instance.scan(print_on_fly)
 
 
-def AX12_get_load(identifiant):
-    check_uint8(identifiant)
-    return float(lib_ax12.AX12getLoad(ctypes.c_uint8(identifiant)))
+    def ping(self):
+        return I2C_bus.instance.ping(self.id)
 
 
-def AX12_get_status(identifiant):
-    check_uint8(identifiant)
-    return int(lib_ax12.AX12getStatus(ctypes.c_uint8(identifiant)))
+    def get_position(self):
+        return float(lib_ax12.AX12getPosition(ctypes.c_uint8(self.id)))
 
 
-def AX12_get_voltage(identifiant):
-    check_uint8(identifiant)
-    return float(lib_ax12.AX12getVoltage(ctypes.c_uint8(identifiant)))
+    def AX12_get_speed(self):
+        return float(lib_ax12.AX12getSpeed(ctypes.c_uint8(self.id)))
 
 
-def AX12_get_temperature(identifiant):
-    check_uint8(identifiant)
-    return int(lib_ax12.AX12getTemperature(ctypes.c_uint8(identifiant)))
+    def AX12_get_load(self):
+        return float(lib_ax12.AX12getLoad(ctypes.c_uint8((self.id)))
 
 
-def AX12_is_moving(identifiant):
-    check_uint8(identifiant)
-    return int(lib_ax12.AX12isMoving(ctypes.c_uint8(identifiant)))
+    def AX12_get_status(self):
+        return int(lib_ax12.AX12getStatus(ctypes.c_uint8((self.id)))
 
 
-def AX12_set_mode(identifiant, mode):
-    check_uint8(identifiant)
-    check_mode(mode)
-
-    ret = int(lib_ax12.AX12setMode(ctypes.c_uint8(identifiant),
-                                   ctypes.c_int(mode)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
+    def AX12_get_voltage(self):
+        return float(lib_ax12.AX12getVoltage(ctypes.c_uint8((self.id)))
 
 
-def AX12_set_speed(identifiant, speed):
-    check_uint8(identifiant)
-
-    ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8(identifiant),
-                                    ctypes.c_double(speed)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
+    def AX12_get_temperature(self):
+        return int(lib_ax12.AX12getTemperature(ctypes.c_uint8((self.id)))
 
 
-def AX12_set_torque(identifiant, torque):
-    check_uint8(identifiant)
-
-    ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8(identifiant),
-                                     ctypes.c_double(torque)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
+    def AX12_is_moving(self):
+        return int(lib_ax12.AX12isMoving(ctypes.c_uint8((self.id)))
 
 
-def AX12_set_LED(identifiant, state):
-    assert(isinstance(state, int))
+    def AX12_set_mode(self, mode):
+        check_mode(mode)
 
-    ret = int(lib_ax12.AX12setLED(ctypes.c_uint8(identifiant),
-                                  ctypes.c_int(state)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
-
-
-def AX12_move(identifiant, position, callback):
-    check_uint8(identifiant)
-    assert(isinstance(position, float))
-    assert(callable(callback))
-
-    ret = int(lib_ax12.AX12move(ctypes.c_uint8(identifiant),
-                                ctypes.c_double(position),
-                                encapsulate_callback(callback)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
+        ret = int(lib_ax12.AX12setMode(ctypes.c_uint8((self.id),
+                                       ctypes.c_int(mode)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret
 
 
-def AX12_cancel_callback(identifiant):
-    check_uint8(identifiant)
-    lib_ax12.AX12CancelCallback(ctypes.c_uint8(identifiant))
+    def AX12_set_speed(self, speed):
+        ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8((self.id),
+                                        ctypes.c_double(speed)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret
 
 
-def AX12_turn(identifiant, speed):
-    check_uint8(identifiant)
+    def AX12_set_torque(self, torque):
+        ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8((self.id),
+                                         ctypes.c_double(torque)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret
 
-    ret = int(lib_ax12.AX12turn(ctypes.c_uint8(identifiant),
-                                ctypes.c_int(speed)))
-    if ret<0:
-        raise Communication_Error(-ret)
-    return ret
+
+    def AX12_set_LED(self, state):
+        assert(isinstance(state, int))
+
+        ret = int(lib_ax12.AX12setLED(ctypes.c_uint8((self.id),
+                                      ctypes.c_int(state)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret
+
+
+    def AX12_move(self, position, callback):
+        assert(isinstance(position, float))
+        assert(callable(callback))
+
+        ret = int(lib_ax12.AX12move(ctypes.c_uint8((self.id),
+                                    ctypes.c_double(position),
+                                    encapsulate_callback(callback)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret
+
+
+    def AX12_cancel_callback(self):
+        lib_ax12.AX12CancelCallback(ctypes.c_uint8((self.id))
+
+
+    def AX12_turn(self, speed):
+        ret = int(lib_ax12.AX12turn(ctypes.c_uint8((self.id),
+                                    ctypes.c_int(speed)))
+        if ret<0:
+            raise Communication_Error(-ret)
+        return ret

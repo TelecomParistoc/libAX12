@@ -7,8 +7,10 @@ TESTS = tests/AX12position tests/AXcomm tests/AXmove
 JSBINDINGS := $(wildcard JSbinding/*.js)
 
 PYTHON_BINDING = PythonBinding/ax12driver.py
+PYTHON_UTIL = PythonBinding/I2C_bus.py
 PYTHON_PREFIX = /usr/local/lib/python2.7/dist-packages/
-LOCAL_PYTHON = AX12.py
+LOCAL_PYTHON_BINDING = AX12.py
+LOCAL_PYTHON_UTIL = I2C_bus.py
 
 CC = gcc
 CFLAGS = -O2 -std=gnu99 -Wall -Werror -fpic
@@ -55,7 +57,9 @@ AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
 
 pythoninstall:
 	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON)
-	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON)", "w+").write(content)';
+	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "w+").write(content)';
+	cp $(PYTHON_UTIL) $(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)
+	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "w+").write(content)';
 
 install: build/$(TARGET) jsinstall AX12console pythoninstall
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
