@@ -56,7 +56,7 @@ AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
 	chmod a+x $(DESTDIR)$(PREFIX)/bin/AX12
 
 pythoninstall:
-	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON)
+	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)
 	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "w+").write(content)';
 	cp $(PYTHON_UTIL) $(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)
 	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "w+").write(content)';

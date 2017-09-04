@@ -6,10 +6,10 @@ class Initialisation_Error(Exception):
     errors = ["Success", "Cannot open AX12 serial port", "Cannot create mutex"]
 
     def __init__(self, index):
-        if index>=len(errors) or index<0:
+        if index>=len(Initialisation_Error.errors) or index<0:
             self.msg = "No error matching return code"
         else:
-            self.msg = Communication_Exception.errors[index]
+            self.msg = Initialisation_Error.errors[index]
 
     def __str__(self):
         return self.msg
