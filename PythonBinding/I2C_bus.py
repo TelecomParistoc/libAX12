@@ -39,14 +39,15 @@ class I2C_bus:
 
     instance = None
 
-    def __init__(self, baudrate=115200):
+    def __init__(self, baudrate=115200, init=True):
         if I2C_bus.instance is not None:
             print("[-] Uneffective new construction of I2C_bus, please use reset to change baudrate")
             return
         I2C_bus.instance = self
 
         self.baudrate = baudrate
-        I2C_bus.init_i2c(baudrate)
+        if init:
+            I2C_bus.init(baudrate)
 
 
     @classmethod
@@ -57,6 +58,9 @@ class I2C_bus:
         ret = int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
         if ret<0:
             raise Initialisation_Error(-error)
+
+        self.instance = I2C_bus(baudrate, False)
+
         return ret
 
 
