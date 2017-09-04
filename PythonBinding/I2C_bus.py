@@ -27,7 +27,7 @@ class Singleton(type):
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        print "Returning "+repr(cls._instances[cls])
+        print("Returning "+repr(cls._instances[cls]))
         return cls._instances[cls]
 
 
@@ -40,18 +40,36 @@ class I2C_bus:
     instance = None
 
     def __init__(self, baudrate=115200):
-        self.baudrate = baudrate
+        if I2C_bus.instance is not None:
+            print("[-] Uneffective new construction of I2C_bus, please use reset to change baudrate")
+            return
+        I2C_bus.instance = self
 
+        self.baudrate = baudrate
+        I2C_bus.init_i2c(baudrate)
+
+
+    @classmethod
+    def init_i2c(cls, baudrate):
         assert(isinstance(baudrate, int))
         assert(7343 <= baudrate <= 1000000)
 
-        I2C_bus.instance = self
-
-        error = int(lib_ax12.initAX12(ctypes.c_int(self.baudrate)))
-        if error<0:
+        ret = int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
+        if ret<0:
             raise Initialisation_Error(-error)
+        return ret
 
-        print I2C_bus.instance.baudrate
+
+    @classmethod
+    def reset(cls, baudrate):
+        if I2C_bus.instance is None:
+            I2C_bus.instance = I2C_bus(baudrate)
+        elif I2C_bus.instance.baudrate != baudrate:
+            if I2C_bus.init_i2c(baudrate) == 0:
+                I2C_bus.instance.baudrate = baudrate
+            else:
+                return -1
+        return 0
 
 
     @classmethod
