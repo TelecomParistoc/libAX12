@@ -58,7 +58,7 @@ class I2C_bus:
 
         ret = int(lib_ax12.initAX12(ctypes.c_int(baudrate)))
         if ret<0:
-            raise Initialisation_Error(-error)
+            raise Initialisation_Error(-ret)
 
         cls.instance = I2C_bus(baudrate, False)
 
