@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 # ce fichier contient les memes fonctions que ax12driver.c, mais ecrites en
-# python cette fois-ci
+# python cette fois-ci et encapsulées dans une classe AX12
 # donc cf ax12driver.h pour avoir la doc
 # en plus, une verification de la validite des arguments est faite
 # ie, si on envoie un float la ou il faut un int, ca va lever une AssertionError
@@ -47,11 +47,16 @@ class AX12:
 
 
     @classmethod
-    def scan_i2c(cls, print_on_fly=None):
-        if I2C_bus.instance is None:
+    def scan_i2c(cls, print_on_fly=None, baudrate=None):
+        if I2C_bus.instance is None and baudrate is None:
             print "[-] Unable to scan I2C bus because not initialized"
-        else:
-            I2C_bus.scan(print_on_fly)
+            return None
+        elif I2C_bus.instance is None:
+            I2C_bus(baudrate)
+        elif baudrate is not None and baudrate != I2C_bus.baudrate:
+            print "[.] Baudrate used to scan i2c does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
+            I2C_bus(baudrate)
+        return I2C_bus.scan(print_on_fly)
 
 
     def ping(self):
