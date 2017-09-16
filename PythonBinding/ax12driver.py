@@ -35,8 +35,17 @@ def check_mode(m):
 
 
 class AX12:
-
+    """
+    AX12 emulates a physical AX12 servomotor
+    """
     def __init__(self, id, baudrate=115200):
+        """
+        Constructs a new 'AX12' object and instanciates I2C_bus if needed
+
+        :param id: The id of the AX12, must be between 0 and 255
+        :param baudrate: The baudrate to communicate with the AX12, defaults to 115200
+        :return: Returns nothing
+        """
         check_uint8(id)
         self.id = id
         if I2C_bus.instance is None:
@@ -48,6 +57,11 @@ class AX12:
 
     @classmethod
     def scan_i2c(cls, print_on_fly=None, baudrate=None):
+        """
+        Lists AX12 connected to the raspberry
+
+        :return: A list of the id of the connected raspberry
+        """
         if I2C_bus.instance is None and baudrate is None:
             print "[-] Unable to scan I2C bus because not initialized"
             return None
@@ -60,38 +74,84 @@ class AX12:
 
 
     def ping(self):
+        """
+        Pings the AX12
+
+        :return: 0 if the ping succeeded, a negative error value else
+        """
         return I2C_bus.ping(self.id)
 
 
     def get_status(self):
+        """
+        Checks the status of the AX12
+
+        :return: 0 if everything is fine, a negative value in case of an error
+        """
         return int(lib_ax12.AX12getStatus(ctypes.c_uint8(self.id)))
 
 
     def get_position(self):
+        """
+        Gets the current position of the AX12
+
+        :return: The position in degree from -150 to 150 increasing clockwise
+        """
         return lib_ax12.AX12getPosition(ctypes.c_uint8(self.id))
 
 
     def get_speed(self):
+        """
+        Gets the current speed of the AX12, may be inaccurate
+
+        :return: The speed in %, a positive value means a clockwise speed
+        """
         return lib_ax12.AX12getSpeed(ctypes.c_uint8(self.id))
 
 
     def get_load(self):
+        """
+        Gets the current load of the AX12, may be inaccurate
+
+        :return: The load in %, a positive value means a clockwise load
+        """
         return lib_ax12.AX12getLoad(ctypes.c_uint8(self.id))
 
 
     def get_voltage(self):
+        """
+        Gets the current voltage of the AX12
+
+        :return: The voltage in Volts
+        """
         return lib_ax12.AX12getVoltage(ctypes.c_uint8(self.id))
 
 
     def get_temperature(self):
+        """
+        Gets the current temperature of the AX12
+
+        :return: The temperature in Celcius degrees
+        """
         return int(lib_ax12.AX12getTemperature(ctypes.c_uint8(self.id)))
 
 
     def is_moving(self):
+        """
+        Checks if the AX12 is moving
+
+        :return: 1 if the AX12 is moving, 0 otherwise
+        """
         return int(lib_ax12.AX12isMoving(ctypes.c_uint8(self.id)))
 
 
     def set_mode(self, mode):
+        """
+        Sets the mode of the AX12
+
+        :param mode: 0 for default mode, 1 for wheel mode
+        :return: 0 in case of success, raises an exception otherwise
+        """
         check_mode(mode)
 
         ret = int(lib_ax12.AX12setMode(ctypes.c_uint8(self.id),
@@ -102,6 +162,12 @@ class AX12:
 
 
     def set_speed(self, speed):
+        """
+        Sets the speed of the AX12
+
+        :param speed: A percentage, positive for a clockwise speed
+        :return: 0 in case of success, raises an exception otherwise
+        """
         ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8(self.id),
                                         ctypes.c_double(speed)))
         if ret<0:
@@ -110,6 +176,12 @@ class AX12:
 
 
     def set_torque(self, torque):
+        """
+        Sets the torque limit of the AX12
+
+        :param torque: A percentage, if 0 the AX12 won't be able to move
+        :return: 0 in case of success, raises an exception otherwise
+        """
         ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8(self.id),
                                          ctypes.c_double(torque)))
         if ret<0:
@@ -118,6 +190,12 @@ class AX12:
 
 
     def set_LED(self, state):
+        """
+        Sets the LED state of the AX12
+
+        :param state: 1 to put the LED on, 0 to put the LED off
+        :return: 0 in case of success, raises an exception otherwise
+        """
         assert(isinstance(state, int))
 
         ret = int(lib_ax12.AX12setLED(ctypes.c_uint8(self.id),
@@ -128,6 +206,13 @@ class AX12:
 
 
     def move(self, position, callback=lambda:None):
+        """
+        Orders the AX12 to move to a specified position
+
+        :param position: A position in degree from -150 to 150 increasing clockwise
+        :param callback: A function to be called at the end of the movement
+        :return: 0 in case of success, raises an exception otherwise
+        """
         assert(isinstance(position, float) or isinstance(position, int))
         assert(callable(callback))
 
@@ -140,10 +225,21 @@ class AX12:
 
 
     def cancel_callback(self):
+        """
+        Cancels the end move callback of the AX12
+
+        :return: Returns nothing
+        """
         lib_ax12.AX12CancelCallback(ctypes.c_uint8(self.id))
 
 
     def turn(self, speed):
+        """
+        Orders the AX12 to turn at a constant speed
+
+        :param speed: a percentage, positive for a clockwise speed
+        :return: 0 in case of success, raises an exception otherwise
+        """
         assert(isinstance(speed, float) or isinstance(speed, int))
 
         ret = int(lib_ax12.AX12turn(ctypes.c_uint8(self.id),
