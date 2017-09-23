@@ -55,7 +55,9 @@ AX12console: AX12console/app.js AX12console/package.json AX12console/AX12
 	cp AX12console/AX12 $(DESTDIR)$(PREFIX)/bin/
 	chmod a+x $(DESTDIR)$(PREFIX)/bin/AX12
 
-pythoninstall:
+pythoninstall: build/$(TARGET)
+	mkdir -p $(DESTDIR)$(PREFIX)/lib
+	cp build/$(TARGET) $(DESTDIR)$(PREFIX)/lib/
 	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)
 	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_BINDING)", "w+").write(content)';
 	cp $(PYTHON_UTIL) $(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)
