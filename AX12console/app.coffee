@@ -63,7 +63,7 @@ registersTable.push([('0x' + reg.address.toString(16).toUpperCase()).blue, name,
 context = ->
     colors = require __dirname + '/node_modules/colors'
     Table = require __dirname + '/node_modules/cli-table'
-    comm = require __dirname + '/../walkingdriver/ax-comm.js'
+    comm = require __dirname + '/../AX12/ax-comm.js'
 
     comm.init 115200
     # force baudrate
