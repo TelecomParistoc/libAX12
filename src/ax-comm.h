@@ -3,6 +3,14 @@
 #ifndef AXCOMM_H
 #define AXCOMM_H
 
+#ifdef CHIBIOS
+#define SerialConfig_t SerialConfig
+#else
+typedef struct SerialConfig_s {
+	int baudrate;
+} SerialConfig_t;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,7 +27,7 @@ extern "C" {
 
 
 /* initialize serial port. Calling this is MANDATORY before any other operation */
-int initAXcomm(int baudrate);
+int initAXcomm(SerialConfig_t *config);
 
 /* perform a transaction with an AX12 (send a packet and wait for the answer)
  * common arguments :

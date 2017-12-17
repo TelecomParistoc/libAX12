@@ -29,7 +29,7 @@ build:
 	@mkdir -p build
 build/%.o: %.c build/%.d
 	@echo "$<"
-	@$(CC) -c -o $@ $< $(CFLAGS)
+	@$(CC) -c -o $@ $< $(CFLAGS) $(EXTRAFLAGS)
 build/%.d : %.c
 	@$(CC) $(CFLAGS) -MM -MF $@ -MP $<
 
@@ -72,5 +72,8 @@ install: build/$(TARGET) jsinstall AX12console pythoninstall
 	chmod 0755 $(DESTDIR)$(PREFIX)/lib/$(TARGET)
 	ldconfig
 	ldconfig -p | grep AX12
+
+ChibiOS:
+	make EXTRAFLAGS=-DCHIBIOS
 
 -include $(subst .c,.d,$(SRCS))

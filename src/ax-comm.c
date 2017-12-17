@@ -1,26 +1,76 @@
 #include "ax-comm.h"
 #include "ax-constants.h"
+
+#ifdef CHIBIOS
+#include "ch.h"
+#include "hal.h"
+#include "RTT/SEGGER_RTT.h"
+
+int getDataAvail(input_queue_t *iqp) {
+	int ret; /* Number of bytes available for reading */
+	chSysLock();
+	ret = chIQGetFullI(iqp);
+	chSysUnlock();
+	return ret;
+}
+
+#define SEND_CHAR(driver, value) sdPut(driver, value)
+#define GET_CHAR(driver) sdGetTimeout(driver, TIME_IMMEDIATE)
+#define DATA_AVAILABLE(driver) getDataAvail(&driver->iqueue)
+#define GET_TIME_IN_MS() ST2MS(chVTGetSystemTime())
+#define LOCK_SEM(sem) chBSemWait(sem)
+#define UNLOCK_SEM(sem) chBSemSignal(sem)
+#define INIT_SEM(sem) 1
+#define INIT_SERIAL_DRIVER(driver, config) sdStart(driver, config)
+#define IS_SD_VALID(driver) (driver != NULL)
+#define SERIAL_FLUSH(driver)
+#define waitForMicro(delay)
+static virtual_timer_t vt;
+typedef void(*SchedulerCb)(void);
+void vt_cb(void *cb) {
+	((SchedulerCb)cb)();
+}
+#define SCHEDULE_IN(time, cb) chVTSet(&vt, MS2ST(time), vt_cb, cb);
+#else /* RASPBERRY PI */
 #include <robotutils.h>
 #include <wiringSerial.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#define SEND_CHAR(driver, value) serialPutchar(driver, value)
+#define GET_CHAR(driver) serialGetchar(driver)
+#define DATA_AVAILABLE(driver) serialDataAvail(driver)
+#define GET_TIME_IN_MS() getCurrentTime()
+#define LOCK_SEM(sem) pthread_mutex_lock(sem)
+#define UNLOCK_SEM(sem) pthread_mutex_unlock(sem)
+#define INIT_SEM(sem) pthread_mutex_init(sem, NULL)
+#define INIT_SERIAL_DRIVER(driver, config) driver = serialOpen("/dev/serial0", config->baudrate)
+#define IS_SD_VALID(driver) (driver >= 0)
+#define SERIAL_FLUSH(driver) serialFlush(driver)
+#define SCHEDULE_IN(time, cb) scheduleIn(time, cb)
+#endif /* CHIBIOS */
 
 // make sure there's at most one transaction ongoing
+#ifdef CHIBIOS
+static SerialDriver *serial = &SD1;
+BSEMAPHORE_DECL(serialLock, FALSE);
+#else
 pthread_mutex_t serialLock;
-
 static int serial = -1;
+#endif /* CHIBIOS */
+
 static long long int startTime = 0;
 
 static int errorLog = 1;
 
-int initAXcomm(int baudrate) {
-	if(pthread_mutex_init(&serialLock, NULL)) {
+int initAXcomm(SerialConfig_t *config) {
+	if(INIT_SEM(&serialLock)) {
 		printf("ERROR : cannot create mutex\n");
 		return -2;
 	}
-	serial = serialOpen("/dev/serial0", baudrate);
-	if(serial == -1) {
+
+	INIT_SERIAL_DRIVER(serial, config);
+	if(!IS_SD_VALID(serial)) {
 		printf("ERROR : cannot open AX12 serial port\n");
 		return -1;
 	}
@@ -29,48 +79,50 @@ int initAXcomm(int baudrate) {
 
 static int axSendPacket(uint8_t id, uint8_t instruction, uint8_t command, uint8_t arg1, uint8_t arg2, int argCount) {
 	uint8_t checksum = ~(id + instruction + command + arg1 + arg2 + 2 + argCount);
-	if(serial < 0) {
+
+    if (!IS_SD_VALID(serial)) {
 		printf("ERROR : serial port not initialized\n");
 		return -1;
 	}
-	serialPutchar(serial, 0xFF); serialPutchar(serial, 0xFF);
-	serialPutchar(serial, id);
-	serialPutchar(serial, 2+argCount);
-	serialPutchar(serial, instruction);
+
+	SEND_CHAR(serial, 0xFF); SEND_CHAR(serial, 0xFF);
+	SEND_CHAR(serial, id);
+	SEND_CHAR(serial, 2+argCount);
+	SEND_CHAR(serial, instruction);
 	if(argCount>0)
-		serialPutchar(serial, command);
+		SEND_CHAR(serial, command);
 	if(argCount>1)
-		serialPutchar(serial, arg1);
+		SEND_CHAR(serial, arg1);
 	if(argCount==3)
-		serialPutchar(serial, arg2);
-	serialPutchar(serial, checksum);
+		SEND_CHAR(serial, arg2);
+	SEND_CHAR(serial, checksum);
 
 	return 0;
 }
 
 static int checkTimeout() {
-	return getCurrentTime() - startTime > AX_MAX_ANSWER_WAIT;
+	return GET_TIME_IN_MS() - startTime > AX_MAX_ANSWER_WAIT;
 }
 static int axReceiveAnswer(uint8_t expectedId, uint16_t* result, uint8_t* statusError) {
-	startTime = getCurrentTime();
+	startTime = GET_TIME_IN_MS();
 	while(!checkTimeout()) {
-		if(serialDataAvail(serial) >= 6 && serialGetchar(serial) == 0xFF && serialGetchar(serial) == 0xFF) {
+		if(DATA_AVAILABLE(serial) >= 6 && GET_CHAR(serial) == 0xFF && GET_CHAR(serial) == 0xFF) {
 			uint8_t id, length, error, checksum, arg1, arg2;
-			id = serialGetchar(serial);
-			length = serialGetchar(serial);
-			error = serialGetchar(serial);
+			id = GET_CHAR(serial);
+			length = GET_CHAR(serial);
+			error = GET_CHAR(serial);
 			if(length > 2) {
-				arg1 = serialGetchar(serial);
+				arg1 = GET_CHAR(serial);
 				// wait for one more byte
-				while(!checkTimeout() && serialDataAvail(serial) < 1)
+				while(!checkTimeout() && DATA_AVAILABLE(serial) < 1)
 					waitForMicro(100);
 			} else {
 				arg1 = 0;
 			}
 			if(length > 3 && !checkTimeout()) {
-				arg2 = serialGetchar(serial);
+				arg2 = GET_CHAR(serial);
 				// wait for one more byte
-				while(!checkTimeout() && serialDataAvail(serial) < 1)
+				while(!checkTimeout() && DATA_AVAILABLE(serial) < 1)
 					waitForMicro(100);
 			} else {
 				arg2 = 0;
@@ -79,7 +131,7 @@ static int axReceiveAnswer(uint8_t expectedId, uint16_t* result, uint8_t* status
 			// make sure packet came back complete and without error
 			if(checkTimeout())
 				return -4;
-			checksum = serialGetchar(serial);
+			checksum = GET_CHAR(serial);
 			if(((uint8_t)~(id+length+error+arg1+arg2)) != checksum)
 				return -2;
 			if(id != expectedId)
@@ -113,16 +165,18 @@ static void printCommError(int id, int code) {
 }
 
 static void releaseSerialLock() {
-	pthread_mutex_unlock(&serialLock);
+	UNLOCK_SEM(&serialLock);
 }
+
 static int axTransaction(uint8_t id, uint8_t instruction, uint8_t command, uint16_t arg,
 	int argCount, uint16_t* result, uint8_t* error)
 {
 	int code = 0;
+	int index;
 
-	pthread_mutex_lock(&serialLock); // only one transaction at a time
-	for(int i=0; i<AX_SEND_RETRY+1; i++) {
-		serialFlush(serial); // make sure there is no byte left in RX buffer
+	LOCK_SEM(&serialLock); // only one transaction at a time
+	for(index = 0; index < AX_SEND_RETRY + 1; index++) {
+		SERIAL_FLUSH(serial); // make sure there is no byte left in RX buffer
 		if(axSendPacket(id, instruction, command, arg&0xFF, (arg >> 8)&0xFF, argCount)) {
 			code = -1;
 			break;
@@ -133,7 +187,7 @@ static int axTransaction(uint8_t id, uint8_t instruction, uint8_t command, uint1
 	}
 
 	// wait before releasing the lock to make sure AX12 has time to recover
-	scheduleIn(15, releaseSerialLock);
+	SCHEDULE_IN(15, releaseSerialLock);
 
 	if(errorLog && code != 0)
 		printCommError(id, code);
@@ -143,9 +197,11 @@ static int axTransaction(uint8_t id, uint8_t instruction, uint8_t command, uint1
 int axWrite8(uint8_t id, uint8_t command, uint8_t arg, uint8_t* statusError) {
 	return axTransaction(id, AX_WRITE_DATA, command, arg, 2, (uint16_t*)NULL, statusError);
 }
+
 int axWrite16(uint8_t id, uint8_t command, uint16_t arg, uint8_t* statusError) {
 	return axTransaction(id, AX_WRITE_DATA, command, arg, 3, (uint16_t*)NULL, statusError);
 }
+
 int axRead8(uint8_t id, uint8_t command, uint8_t* result, uint8_t* statusError) {
 	int code;
 	uint16_t result16;
@@ -153,15 +209,19 @@ int axRead8(uint8_t id, uint8_t command, uint8_t* result, uint8_t* statusError) 
 	*result = (uint8_t) result16;
 	return code;
 }
+
 int axRead16(uint8_t id, uint8_t command, uint16_t* result, uint8_t* statusError) {
 	return axTransaction(id, AX_READ_DATA, command, 2, 2, result, statusError);
 }
+
 int axPing(uint8_t id, uint8_t* statusError) {
 	return axTransaction(id, AX_PING, 0, 0, 0, (uint16_t*)NULL, statusError);
 }
+
 int axFactoryReset(uint8_t id, uint8_t* statusError) {
 	return axTransaction(id, AX_RESET, 0, 0, 0, (uint16_t*)NULL, statusError);
 }
+
 void enableErrorPrint(int enable) {
 	errorLog = enable;
 }
