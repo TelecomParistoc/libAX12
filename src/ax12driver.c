@@ -1,10 +1,18 @@
 #include "ax12driver.h"
 #include "ax-comm.h"
 #include "ax-constants.h"
-#include <robotutils.h>
-#include <stdio.h>
 #include <math.h>
+
+#ifdef CHIBIOS
+#include "RTT/SEGGER_RTT.h"
+#define waitFor(delay) chThdSleepMilliseconds(delay)
+#define GET_TIME_IN_MS() ST2MS(chVTGetSystemTime())
+#else
+#include <stdio.h>
+#include <robotutils.h>
 #include <pthread.h>
+#define GET_TIME_IN_MS() getCurrentTime()
+#endif
 
 #define AX_MAX_MOVING 40
 #define AX_UPDATE_TIME_LIMIT 3
@@ -13,7 +21,11 @@ static void (*axMovingCallbacks[AX_MAX_MOVING])(void);
 static int axMovingIDs[AX_MAX_MOVING] = {[0 ... AX_MAX_MOVING-1]=-1};
 static double axMovingGoals[AX_MAX_MOVING];
 
+#ifdef CHIBIOS
+THD_WORKING_AREA(wa_updater, 1024);
+#else
 static pthread_t updater;
+#endif
 
 static int axModes[256] = {[0 ... 255]=-1};
 
@@ -67,9 +79,10 @@ int AX12isMoving(uint8_t id) {
 }
 
 int AX12setMode(uint8_t id, int mode) {
+	int index;
 	if(id == 0xFE)
-		for(int i=0; i<0xFE; i++)
-			axModes[i] = mode;
+		for(index = 0; index < 0xFE; index++)
+			axModes[index] = mode;
 	else
 		axModes[id] = mode;
 	return axWrite16(id, AX_CCW_LIMIT, mode ? 0: 0x3FF, NULL);
@@ -177,30 +190,40 @@ static void axUpdateMoving(int i) {
 		axMovingCallbacks[i]();
 }
 
+#ifdef CHIBIOS
+THD_FUNCTION(axMovingUpdater, arg) {
+#else
 static void* axMovingUpdater(void* arg) {
+#endif
 	long long int loopStartTime;
 	int i = 0;
 
 	if(arg) {}
 
 	while(1) {
-		loopStartTime = getCurrentTime();
+		loopStartTime = GET_TIME_IN_MS();
 		if(i >= AX_MAX_MOVING)
 			i = 0;
 		for(; i<AX_MAX_MOVING; i++)
 			if(axMovingIDs[i] != -1) {
-				if(getCurrentTime() - loopStartTime > AX_UPDATE_TIME_LIMIT)
+				if(GET_TIME_IN_MS() - loopStartTime > AX_UPDATE_TIME_LIMIT)
 					break;
 				axUpdateMoving(i);
 			}
-		waitFor(100 + loopStartTime - getCurrentTime()); // 1 cycle / 100ms
+		waitFor(100 + loopStartTime - GET_TIME_IN_MS()); // 1 cycle / 100ms
 	}
+#ifdef CHIBIOS
+	return;
+#else
 	return NULL;
+#endif
 }
 
 // init AX12
 int initAX12(int baudrate) {
-	int code = initAXcomm(baudrate);
+	SerialConfig_t config;
+	config.speed = baudrate;
+	int code = initAXcomm(&config);
 	if(code) {
 		printf("ERROR : cannot initialize AX12 communication, error code: %d \n", code);
 		return code;
@@ -208,9 +231,13 @@ int initAX12(int baudrate) {
 
 	AX12resetAll();
 
+#ifdef CHIBIOS
+	chThdCreateStatic(wa_updater, sizeof(wa_updater), NORMALPRIO + 1, axMovingUpdater, NULL);
+#else
 	if(pthread_create(&updater, NULL, axMovingUpdater, NULL)) {
 		printf("ERROR : cannot create AX12 update thread\n");
 		return -3;
 	}
+#endif
 	return 0;
 }

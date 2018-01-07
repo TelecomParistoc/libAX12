@@ -4,10 +4,11 @@
 #define AXCOMM_H
 
 #ifdef CHIBIOS
+#include "hal.h"
 #define SerialConfig_t SerialConfig
 #else
 typedef struct SerialConfig_s {
-	int baudrate;
+	int speed;
 } SerialConfig_t;
 #endif
 

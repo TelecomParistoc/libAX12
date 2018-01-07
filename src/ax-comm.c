@@ -44,7 +44,7 @@ void vt_cb(void *cb) {
 #define LOCK_SEM(sem) pthread_mutex_lock(sem)
 #define UNLOCK_SEM(sem) pthread_mutex_unlock(sem)
 #define INIT_SEM(sem) pthread_mutex_init(sem, NULL)
-#define INIT_SERIAL_DRIVER(driver, config) driver = serialOpen("/dev/serial0", config->baudrate)
+#define INIT_SERIAL_DRIVER(driver, config) driver = serialOpen("/dev/serial0", config->speed)
 #define IS_SD_VALID(driver) (driver >= 0)
 #define SERIAL_FLUSH(driver) serialFlush(driver)
 #define SCHEDULE_IN(time, cb) scheduleIn(time, cb)
