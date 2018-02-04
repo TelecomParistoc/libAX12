@@ -4,7 +4,7 @@
 #include <math.h>
 
 #ifdef CHIBIOS
-#include "RTT/SEGGER_RTT.h"
+#include "../../src/RTT/SEGGER_RTT.h"
 #define waitFor(delay) chThdSleepMilliseconds(delay)
 #define GET_TIME_IN_MS() ST2MS(chVTGetSystemTime())
 #else
@@ -161,7 +161,7 @@ int AX12turn(uint8_t id, double speed) {
 		AX12setMode(id, WHEEL_MODE);
 	return axWrite16(id, AX_GOAL_SPEED, value, NULL);
 }
-void AX12resetAll() {
+void AX12resetAll(void) {
 	axWrite8(0xFE, AX_RETURN, 2, NULL); // AX12 respond to all instructions
 	axWrite16(0xFE, AX_DELAY, 3, NULL); // return delay = 6us
 	axWrite8(0xFE, AX_ALARM_SHUTDOWN, 0x25, NULL); // torque OFF on overheating, overload, voltage error
@@ -221,7 +221,7 @@ static void* axMovingUpdater(void* arg) {
 
 // init AX12
 int initAX12(int baudrate) {
-	SerialConfig_t config;
+	SerialConfig_t config = {0};
 	config.speed = baudrate;
 	int code = initAXcomm(&config);
 	if(code) {

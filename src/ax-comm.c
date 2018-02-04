@@ -4,23 +4,23 @@
 #ifdef CHIBIOS
 #include "ch.h"
 #include "hal.h"
-#include "RTT/SEGGER_RTT.h"
+#include "../../src/RTT/SEGGER_RTT.h"
 
 int getDataAvail(input_queue_t *iqp) {
 	int ret; /* Number of bytes available for reading */
 	chSysLock();
-	ret = chIQGetFullI(iqp);
+	ret =  (int)iqp->q_counter;
 	chSysUnlock();
 	return ret;
 }
 
 #define SEND_CHAR(driver, value) sdPut(driver, value)
-#define GET_CHAR(driver) sdGetTimeout(driver, TIME_IMMEDIATE)
+#define GET_CHAR(driver) (uint8_t)sdGetTimeout(driver, TIME_IMMEDIATE)
 #define DATA_AVAILABLE(driver) getDataAvail(&driver->iqueue)
 #define GET_TIME_IN_MS() ST2MS(chVTGetSystemTime())
 #define LOCK_SEM(sem) chBSemWait(sem)
-#define UNLOCK_SEM(sem) chBSemSignal(sem)
-#define INIT_SEM(sem) 1
+#define UNLOCK_SEM(sem) do {chSysLockFromISR(); chBSemSignalI(sem); chSysUnlockFromISR();} while(0)
+#define INIT_SEM(sem) 0
 #define INIT_SERIAL_DRIVER(driver, config) sdStart(driver, config)
 #define IS_SD_VALID(driver) (driver != NULL)
 #define SERIAL_FLUSH(driver)
@@ -52,7 +52,7 @@ void vt_cb(void *cb) {
 
 // make sure there's at most one transaction ongoing
 #ifdef CHIBIOS
-static SerialDriver *serial = &SD1;
+static SerialDriver *serial = &SD3;
 BSEMAPHORE_DECL(serialLock, FALSE);
 #else
 pthread_mutex_t serialLock;
@@ -100,7 +100,7 @@ static int axSendPacket(uint8_t id, uint8_t instruction, uint8_t command, uint8_
 	return 0;
 }
 
-static int checkTimeout() {
+static int checkTimeout(void) {
 	return GET_TIME_IN_MS() - startTime > AX_MAX_ANSWER_WAIT;
 }
 static int axReceiveAnswer(uint8_t expectedId, uint16_t* result, uint8_t* statusError) {
@@ -164,7 +164,7 @@ static void printCommError(int id, int code) {
 	}
 }
 
-static void releaseSerialLock() {
+static void releaseSerialLock(void) {
 	UNLOCK_SEM(&serialLock);
 }
 

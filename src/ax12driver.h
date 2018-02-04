@@ -192,7 +192,7 @@ int AX12turn(uint8_t id, double speed);
  *
  * Default config includes enable and set torque to maximum,speed at 50%, default mode).
  */
-void AX12resetAll();
+void AX12resetAll(void);
 
 #ifdef __cplusplus
 }
