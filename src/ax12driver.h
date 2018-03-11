@@ -11,6 +11,30 @@
 extern "C" {
 #endif
 
+#define AX12_MAX_ID 0xFD
+
+/** @brief The EEPROM config of an AX12.
+ *
+ */
+typedef struct {
+    uint16_t modelNb;
+    uint8_t fwVersion;
+    uint8_t id;
+    uint8_t baudrate;
+    uint8_t returnDelayTime;
+    uint16_t CWLimit;
+    uint16_t CCWLimit;
+    uint8_t maxTemp;
+    uint8_t minVolt;
+    uint8_t maxVolt;
+    uint16_t maxTorque;
+    uint8_t returnLevel;
+    uint8_t alarmLED;
+    uint8_t alarmShutdown;
+    uint16_t downCal;
+    uint16_t upCal;
+} AX12Config_t;
+
 /** @brief Initialize the AX12 driver.
  *
  *  Calling this is **MANDATORY** for proper use.
@@ -193,6 +217,17 @@ int AX12turn(uint8_t id, double speed);
  * Default config includes enable and set torque to maximum,speed at 50%, default mode).
  */
 void AX12resetAll(void);
+
+/** @brief Dump the EEPROM of the AX12.
+ *
+ * @param[in/out] config Pointer to the struct where to put data. The ID field
+ *                       must be filled with the requested ID.
+ *
+ * @return Error code:
+ *        0 No error
+ *        1 Error
+ */
+uint8_t AX12dump(AX12Config_t *config);
 
 #ifdef __cplusplus
 }

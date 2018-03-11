@@ -9,6 +9,8 @@
 
 // commands (AX12 registers) : not exhaustive but sufficient in most cases
 // EEPROM
+#define AX_MODEL_NB 0x00
+#define AX_FW_VER 0x02
 #define AX_ID 0x03
 #define AX_BAUDRATE 0x04
 #define AX_DELAY 0x05
@@ -21,6 +23,8 @@
 #define AX_RETURN 0x10
 #define AX_ALARM_LED 0x11
 #define AX_ALARM_SHUTDOWN 0x12
+#define AX_DOWN_CAL 0x14
+#define AX_UP_CAL 0x16
 
 //RAM
 #define AX_TORQUE_ENABLE 0x18

@@ -241,3 +241,33 @@ int initAX12(int baudrate) {
 #endif
 	return 0;
 }
+
+uint8_t AX12dump(AX12Config_t *config) {
+	uint8_t error;
+
+	if (config == NULL) {
+		printf("ERROR Null config");
+		return 1;
+	} else if (config->id > AX12_MAX_ID) {
+		printf("ERROR: Invalid ID %d", config->id);
+		return 1;
+	} else {
+		axRead16(config->id, AX_MODEL_NB, &config->modelNb, &error);
+		axRead8(config->id, AX_FW_VER, &config->fwVersion, &error);
+		axRead8(config->id, AX_BAUDRATE, &config->baudrate, &error);
+		axRead8(config->id, AX_DELAY, &config->returnDelayTime, &error);
+		axRead16(config->id, AX_CW_LIMIT, &config->CWLimit, &error);
+		axRead16(config->id, AX_CCW_LIMIT, &config->CCWLimit, &error);
+		axRead8(config->id, AX_MAX_TEMP, &config->maxTemp, &error);
+		axRead8(config->id, AX_MIN_VOLT, &config->minVolt, &error);
+		axRead8(config->id, AX_MAX_VOLT, &config->maxVolt, &error);
+		axRead16(config->id, AX_EE_MAX_TORQUE, &config->maxTorque, &error);
+		axRead8(config->id, AX_RETURN, &config->returnLevel, &error);
+		axRead8(config->id, AX_ALARM_LED, &config->alarmLED, &error);
+		axRead8(config->id, AX_ALARM_SHUTDOWN, &config->alarmShutdown, &error);
+		axRead16(config->id, AX_DOWN_CAL, &config->downCal, &error);
+		axRead16(config->id, AX_UP_CAL, &config->upCal, &error);
+
+		return 0;
+	}
+}
