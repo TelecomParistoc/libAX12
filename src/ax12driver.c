@@ -79,10 +79,10 @@ int AX12isMoving(uint8_t id) {
 }
 
 int AX12setMode(uint8_t id, int mode) {
-	int index;
+	int i;
 	if(id == 0xFE)
-		for(index = 0; index < 0xFE; index++)
-			axModes[index] = mode;
+		for(i = 0; i < 0xFE; i++)
+			axModes[i] = mode;
 	else
 		axModes[id] = mode;
 	return axWrite16(id, AX_CCW_LIMIT, mode ? 0: 0x3FF, NULL);

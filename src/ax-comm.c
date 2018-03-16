@@ -167,7 +167,6 @@ static void printCommError(int id, int code) {
 static void releaseSerialLock(void) {
 	UNLOCK_SEM(&serialLock);
 }
-
 static int axTransaction(uint8_t id, uint8_t instruction, uint8_t command, uint16_t arg,
 	int argCount, uint16_t* result, uint8_t* error)
 {
@@ -197,11 +196,9 @@ static int axTransaction(uint8_t id, uint8_t instruction, uint8_t command, uint1
 int axWrite8(uint8_t id, uint8_t command, uint8_t arg, uint8_t* statusError) {
 	return axTransaction(id, AX_WRITE_DATA, command, arg, 2, (uint16_t*)NULL, statusError);
 }
-
 int axWrite16(uint8_t id, uint8_t command, uint16_t arg, uint8_t* statusError) {
 	return axTransaction(id, AX_WRITE_DATA, command, arg, 3, (uint16_t*)NULL, statusError);
 }
-
 int axRead8(uint8_t id, uint8_t command, uint8_t* result, uint8_t* statusError) {
 	int code;
 	uint16_t result16;
@@ -209,19 +206,15 @@ int axRead8(uint8_t id, uint8_t command, uint8_t* result, uint8_t* statusError) 
 	*result = (uint8_t) result16;
 	return code;
 }
-
 int axRead16(uint8_t id, uint8_t command, uint16_t* result, uint8_t* statusError) {
 	return axTransaction(id, AX_READ_DATA, command, 2, 2, result, statusError);
 }
-
 int axPing(uint8_t id, uint8_t* statusError) {
 	return axTransaction(id, AX_PING, 0, 0, 0, (uint16_t*)NULL, statusError);
 }
-
 int axFactoryReset(uint8_t id, uint8_t* statusError) {
 	return axTransaction(id, AX_RESET, 0, 0, 0, (uint16_t*)NULL, statusError);
 }
-
 void enableErrorPrint(int enable) {
 	errorLog = enable;
 }
