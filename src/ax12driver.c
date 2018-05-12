@@ -167,8 +167,12 @@ void AX12resetAll(void) {
 	axWrite8(0xFE, AX_ALARM_SHUTDOWN, 0x25, NULL); // torque OFF on overheating, overload, voltage error
 	axWrite8(0xFE, AX_ALARM_LED, 0x25, NULL); // LED blinks on overheating, overload, voltage error
 
+	waitFor(20);
+	AX12setMode(0xFE, DEFAULT_MODE);
+	waitFor(20);
 	AX12setTorque(0xFE, 100); // enable torque
-	AX12setSpeed(0xFE, 50); // by defaut, speed set to half the max
+	waitFor(20);
+	//AX12setSpeed(0xFE, 50); // by defaut, speed set to half the max
 }
 
 static void axUpdateMoving(int i) {
