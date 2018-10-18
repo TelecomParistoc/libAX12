@@ -181,12 +181,7 @@ static void axUpdateMoving(int i) {
 
 	// check goal position has been reached
 	if(fabs(AX12getPosition(axMovingIDs[i])- axMovingGoals[i]) > 1.5) {
-		waitFor(20);
-		// false alarm, AX12 moving again
-		if(AX12isMoving(axMovingIDs[i]))
-			return;
-
-		//printf("AX12 error : AX12 %d can't reach its goal\n", axMovingIDs[i]);
+        return;
 	}
 
 	axMovingIDs[i] = -1;
