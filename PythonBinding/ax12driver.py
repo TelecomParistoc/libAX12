@@ -52,11 +52,11 @@ class AX12:
         if I2C_bus.instance is None:
             I2C_bus(baudrate)
         elif I2C_bus.baudrate != baudrate:
-            print "[.] Baudrate used to communicate with AX12 id "+str(id)+" ("+str(baudrate)+") does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
+            print("[.] Baudrate used to communicate with AX12 id ", str(id), " (", str(baudrate), ") does not match previously established baudrate (", I2C_bus.baudrate, ") (changing it)")
             I2C_bus(baudrate)
 
         sleep(.2)
-        print "AX12", id, "is in pos = ", self.get_position()
+        print("AX12", id, "is in pos = ", self.get_position())
         self.move(self.get_position())
 
 
@@ -68,12 +68,12 @@ class AX12:
         :return: A list of the id of the connected raspberry
         """
         if I2C_bus.instance is None and baudrate is None:
-            print "[-] Unable to scan I2C bus because not initialized"
+            print("[-] Unable to scan I2C bus because not initialized")
             return None
         elif I2C_bus.instance is None:
             I2C_bus(baudrate)
         elif baudrate is not None and baudrate != I2C_bus.baudrate:
-            print "[.] Baudrate used to scan i2c does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
+            print("[.] Baudrate used to scan i2c does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)")
             I2C_bus(baudrate)
         return I2C_bus.scan(print_on_fly)
 
@@ -253,6 +253,8 @@ class AX12:
             raise Communication_Error(-ret)
         return ret
 
+from threading import Timer
+
 class AX12_simu:
     """
     Simulated AX12.
@@ -275,7 +277,7 @@ class AX12_simu:
         self.mode = 0
         self.torque = 100
         self.led = True
-        self.timer = Null
+        self.timer = None
 
         sleep(.2)
         print("AX12", id, "is in pos = ", self.get_position())
@@ -422,14 +424,16 @@ class AX12_simu:
         assert(isinstance(position, float) or isinstance(position, int))
         assert(callable(callback))
 
-        self.moving_speed = speed
+        self.moving_speed = self.speed
 
         def callback_simu() :
+            self.position = position
             self.moving_speed = 0
             callback()
 
         #TODO find a coherent value for the timer
         self.timer = Timer(.5, callback_simu)
+        self.timer.start()
 
         return 0
 
@@ -440,7 +444,8 @@ class AX12_simu:
 
         :return: Returns nothing
         """
-        if(not timer is None) self.timer.cancel()
+        if not timer is None:
+            self.timer.cancel()
         self.moving_speed = 0
 
 

@@ -6,9 +6,9 @@ TESTS = tests/AX12position tests/AXcomm tests/AXmove
 
 JSBINDINGS := $(wildcard JSbinding/*.js)
 
-PYTHON_BINDING = PythonBinding/ax12*.py
+PYTHON_BINDING = PythonBinding/ax12driver.py
 PYTHON_UTIL = PythonBinding/I2C_bus.py
-PYTHON_PREFIX = /usr/local/lib/python2.7/dist-packages/
+PYTHON_PREFIX = /usr/local/lib/python3.4/dist-packages/
 LOCAL_PYTHON_BINDING = AX12.py
 LOCAL_PYTHON_UTIL = I2C_bus.py
 

@@ -115,17 +115,17 @@ class I2C_bus:
     @classmethod
     def scan(cls, print_enable=False):
         elems = []
-	if not print_enable:
-	    old_stdout = sys.stdout
-	    sys.stdout = open("/dev/null", "w")
-	    print "j'aime les babouches"
+        if not print_enable:
+            old_stdout = sys.stdout
+            sys.stdout = open("/dev/null", "w")
+            print("j'aime les babouches")
 
-        for i in range(254):
-            if I2C_bus.ping(i) == 0:
-                elems.append(i)
+            for i in range(254):
+                if I2C_bus.ping(i) == 0:
+                    elems.append(i)
 
-	if not print_enable:
-	    sys.stdout.close()
-	    sys.stdout = old_stdout
+        if not print_enable:
+            sys.stdout.close()
+            sys.stdout = old_stdout
 
         return elems
