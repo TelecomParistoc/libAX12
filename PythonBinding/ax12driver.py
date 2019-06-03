@@ -55,9 +55,8 @@ class AX12:
             print "[.] Baudrate used to communicate with AX12 id "+str(id)+" ("+str(baudrate)+") does not match previously established baudrate ("+I2C_bus.baudrate+") (changing it)"
             I2C_bus(baudrate)
 
-        print "[first]  AX12", id, "is in pos = ", self.get_position()
         sleep(.2)
-        print "[second] AX12", id, "is in pos = ", self.get_position()
+        print "AX12", id, "is in pos = ", self.get_position()
         self.move(self.get_position())
 
 
@@ -163,7 +162,7 @@ class AX12:
         ret = int(lib_ax12.AX12setMode(ctypes.c_uint8(self.id),
                                        ctypes.c_int(mode)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
 
 
@@ -177,7 +176,7 @@ class AX12:
         ret = int(lib_ax12.AX12setSpeed(ctypes.c_uint8(self.id),
                                         ctypes.c_double(speed)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
 
 
@@ -191,7 +190,7 @@ class AX12:
         ret = int(lib_ax12.AX12setTorque(ctypes.c_uint8(self.id),
                                          ctypes.c_double(torque)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
 
 
@@ -207,7 +206,7 @@ class AX12:
         ret = int(lib_ax12.AX12setLED(ctypes.c_uint8(self.id),
                                       ctypes.c_int(state)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
 
 
@@ -226,7 +225,7 @@ class AX12:
                                     ctypes.c_double(position),
                                     encapsulate_callback(callback)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
 
 
@@ -251,5 +250,5 @@ class AX12:
         ret = int(lib_ax12.AX12turn(ctypes.c_uint8(self.id),
                                     ctypes.c_double(speed)))
         if ret<0:
-            print Communication_Error(-ret)
+            raise Communication_Error(-ret)
         return ret
