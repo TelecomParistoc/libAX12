@@ -1,4 +1,6 @@
 from threading import Timer
+from I2C_bus import *
+from time import sleep
 
 class AX12_simu:
     """
