@@ -59,7 +59,7 @@ int axPing(uint8_t id, uint8_t* statusError);
  * will set the baudrate to 1Mbps and ID to 1 */
 int axFactoryReset(uint8_t id, uint8_t* statusError);
 
-/* enable debug messafe print on communication error */
+/* enable debug message print on communication error */
 void enableErrorPrint(int enable);
 
 #ifdef __cplusplus
