@@ -1,5 +1,4 @@
 from threading import Timer
-from I2C_bus import *
 from time import sleep
 
 class AX12_simu:
@@ -9,13 +8,12 @@ class AX12_simu:
     for debugging purposes.
     """
 
-    def __init__(self, id, baudrate=115200):
+    def __init__(self, id, baudrate=115200, response_time=0.5):
         """
         :param id: The id of the AX12, must be between 0 and 255
         :param baudrate: The baudrate to communicate with the AX12, defaults to 115200
         :return: returns nothing
         """
-        check_uint8(id)
         self.id = id
 
         self.position = 0
@@ -25,6 +23,7 @@ class AX12_simu:
         self.torque = 100
         self.led = True
         self.timer = None
+        self.response_time = response_time #s
 
         sleep(.2)
         print("AX12", id, "is in pos = ", self.get_position())
@@ -121,7 +120,6 @@ class AX12_simu:
         :param mode: 0 for default mode, 1 for wheel mode
         :return: 0 in case of success, raises an exception otherwise
         """
-        check_mode(mode)
         self.mode = mode
         return 0
 
@@ -179,7 +177,7 @@ class AX12_simu:
             callback()
 
         #TODO find a coherent value for the timer
-        self.timer = Timer(.5, callback_simu)
+        self.timer = Timer(self.response_time, callback_simu)
         self.timer.start()
 
         return 0

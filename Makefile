@@ -63,6 +63,11 @@ pythoninstall: build/$(TARGET)
 	cp $(PYTHON_UTIL) $(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)
 	sudo python -c 'content = open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "rb").read().replace("LIBNAME", "\"$(DESTDIR)$(PREFIX)/lib/$(TARGET)\""); open("$(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)", "w+").write(content)';
 
+pythoninstall_simu:
+	mkdir -p $(PYTHON_PREFIX)
+	cp $(PYTHON_BINDING) $(PYTHON_PREFIX)
+	cp $(PYTHON_UTIL) $(PYTHON_PREFIX)$(LOCAL_PYTHON_UTIL)
+
 install: build/$(TARGET) jsinstall AX12console pythoninstall
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/AX12
